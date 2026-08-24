@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"npx tsc --noEmit 2>&1\",\"timeout\":60000,\"description\":\"TypeScript type check\"}",
+  "error": "Exit code 1\nnode:internal/modules/cjs/loader:1478\n  throw err;\n  ^\n\nError: Cannot find module '../lib/tsc.js'\nRequire stack:\n- /Users/phanindravarma/projects/outbid/node_modules/.bin/tsc\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1475:15)\n    at wrapResolveFilename (node:internal/modules/cjs/loader:1048:27)\n    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1072:10)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1093:12)\n    at Module....",
+  "timestamp": "2026-08-24T11:59:38.530Z",
+  "retry_count": 1
+}
