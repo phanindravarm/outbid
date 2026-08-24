@@ -1,16 +1,13 @@
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 import "./relations";
 
-// Lazy connection — only connects when first query is made, not at import time
 const globalForDb = globalThis as unknown as {
-  queryClient: ReturnType<typeof postgres> | undefined;
+  db: PostgresJsDatabase<typeof schema> | undefined;
 };
 
-function getQueryClient() {
-  if (globalForDb.queryClient) return globalForDb.queryClient;
-
+function createDb(): PostgresJsDatabase<typeof schema> {
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
@@ -23,22 +20,32 @@ function getQueryClient() {
     prepare: false,
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForDb.queryClient = client;
-  }
-
-  return client;
+  return drizzle(client, { schema });
 }
 
-export const db = drizzle(new Proxy({} as ReturnType<typeof postgres>, {
-  get(_target, prop) {
-    const client = getQueryClient();
-    return Reflect.get(client, prop);
-  },
-  apply(_target, _thisArg, args) {
-    const client = getQueryClient();
-    return Reflect.apply(client as unknown as (...a: unknown[]) => unknown, client, args);
-  },
-}), { schema });
+// Lazy getter — only creates the connection when first accessed
+export function getDb(): PostgresJsDatabase<typeof schema> {
+  if (globalForDb.db) return globalForDb.db;
 
-export type Database = typeof db;
+  const database = createDb();
+
+  if (process.env.NODE_ENV !== "production") {
+    globalForDb.db = database;
+  }
+
+  return database;
+}
+
+// For backward compatibility — proxy that defers to getDb()
+export const db = new Proxy({} as PostgresJsDatabase<typeof schema>, {
+  get(_target, prop, receiver) {
+    const realDb = getDb();
+    const value = Reflect.get(realDb, prop, receiver);
+    if (typeof value === "function") {
+      return value.bind(realDb);
+    }
+    return value;
+  },
+});
+
+export type Database = PostgresJsDatabase<typeof schema>;

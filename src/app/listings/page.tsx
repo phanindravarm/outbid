@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { getRankedListings } from "@/lib/ranking";
 import { db } from "@/db";
