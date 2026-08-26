@@ -24,7 +24,9 @@ export default async function ListingDetailPage({ params }: PageProps) {
       id: listings.id,
       userId: listings.userId,
       title: listings.title,
+      url: listings.url,
       description: listings.description,
+      category: listings.category,
       status: listings.status,
       createdAt: listings.createdAt,
       updatedAt: listings.updatedAt,
@@ -68,7 +70,22 @@ export default async function ListingDetailPage({ params }: PageProps) {
                 {listing.title}
               </h1>
             </div>
+            {listing.url && (
+              <a
+                href={listing.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block text-sm text-blue-600 hover:underline dark:text-blue-400"
+              >
+                {listing.url} ↗
+              </a>
+            )}
             <div className="mt-2 flex items-center gap-3 text-sm text-zinc-500">
+              {listing.category && (
+                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                  {listing.category.charAt(0) + listing.category.slice(1).toLowerCase()}
+                </span>
+              )}
               <span>
                 {listing.ownerType === "PERSONAL" ? "👤" : "🏢"}{" "}
                 {listing.ownerName}
@@ -134,11 +151,11 @@ export default async function ListingDetailPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Bid form (only for authenticated non-owners on active listings) */}
-          {listing.status === "ACTIVE" && session && !isOwner && (
+          {/* Bid form (only for owner on active listings) */}
+          {listing.status === "ACTIVE" && session && isOwner && (
             <div className="rounded-xl border border-zinc-200 p-6 dark:border-zinc-800">
               <h2 className="mb-4 text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                Place a Bid
+                Boost Your Rank
               </h2>
               <BidForm
                 listingId={listing.id}
@@ -146,26 +163,6 @@ export default async function ListingDetailPage({ params }: PageProps) {
                 minBidCents={MIN_BID_CENTS}
                 userEmail={session.email}
               />
-            </div>
-          )}
-
-          {listing.status === "ACTIVE" && !session && (
-            <div className="rounded-xl border border-zinc-200 p-6 dark:border-zinc-800">
-              <p className="text-sm text-zinc-500">
-                <Link href="/login" className="font-medium underline">
-                  Log in
-                </Link>{" "}
-                to place a bid on this listing.
-              </p>
-            </div>
-          )}
-
-          {isOwner && (
-            <div className="rounded-xl border border-zinc-200 p-6 dark:border-zinc-800">
-              <p className="text-sm text-zinc-500">
-                You own this listing. You cannot bid on it, but you can see all
-                bids below.
-              </p>
             </div>
           )}
         </div>

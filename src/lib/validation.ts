@@ -60,8 +60,29 @@ export function validateBidAmount(amount: unknown): string | null {
 
 export { MIN_BID_CENTS };
 
+export const LISTING_CATEGORIES = [
+  "TECH",
+  "BUSINESS",
+  "BLOG",
+  "ECOMMERCE",
+  "PORTFOLIO",
+  "COMMUNITY",
+  "NEWS",
+  "ENTERTAINMENT",
+] as const;
+
+export type ListingCategory = (typeof LISTING_CATEGORIES)[number];
+
+export function validateCategory(category: unknown): string | null {
+  if (!category) return "Category is required.";
+  if (!LISTING_CATEGORIES.includes(category as ListingCategory)) {
+    return "Invalid category.";
+  }
+  return null;
+}
+
 export function validateUrl(url: string): string | null {
-  if (!url) return null; // optional
+  if (!url || !url.trim()) return "Website URL is required.";
   if (url.length > 512) return "URL is too long.";
   try {
     new URL(url);

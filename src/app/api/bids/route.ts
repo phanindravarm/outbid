@@ -58,10 +58,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Users cannot bid on their own listings
-    if (listing.userId === session.userId) {
+    // Users can only bid on their own listings
+    if (listing.userId !== session.userId) {
       return NextResponse.json(
-        { error: "You cannot bid on your own listing." },
+        { error: "You can only bid on your own listing." },
         { status: 400 },
       );
     }

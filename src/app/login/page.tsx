@@ -30,7 +30,7 @@ export default function LoginPage() {
       }
 
       router.refresh();
-      router.push("/dashboard");
+      router.push("/profile");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

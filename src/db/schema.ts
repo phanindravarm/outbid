@@ -18,6 +18,17 @@ export const userTypeEnum = pgEnum("user_type", [
   "ORGANIZATION",
 ]);
 
+export const listingCategoryEnum = pgEnum("listing_category", [
+  "TECH",
+  "BUSINESS",
+  "BLOG",
+  "ECOMMERCE",
+  "PORTFOLIO",
+  "COMMUNITY",
+  "NEWS",
+  "ENTERTAINMENT",
+]);
+
 export const listingStatusEnum = pgEnum("listing_status", [
   "DRAFT",
   "ACTIVE",
@@ -95,7 +106,9 @@ export const listings = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     title: varchar("title", { length: 255 }).notNull(),
+    url: varchar("url", { length: 512 }),
     description: text("description"),
+    category: listingCategoryEnum("category"),
     status: listingStatusEnum("status").default("DRAFT").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
@@ -169,6 +182,18 @@ export const transactions = pgTable(
     index("transactions_provider_ref_idx").on(table.providerRef),
   ],
 );
+
+// ─── Sessions ────────────────────────────────────────────────────────────────
+
+// ─── Site Stats ─────────────────────────────────────────────────────────────
+
+export const siteStats = pgTable("site_stats", {
+  key: varchar("key", { length: 50 }).primaryKey(),
+  value: integer("value").default(0).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
 
 // ─── Sessions ────────────────────────────────────────────────────────────────
 

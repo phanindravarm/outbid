@@ -37,22 +37,10 @@ export async function Header() {
           {session ? (
             <>
               <Link
-                href="/dashboard"
+                href="/profile"
                 className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               >
-                Dashboard
-              </Link>
-              <Link
-                href="/listings/my"
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
-                My Listings
-              </Link>
-              <Link
-                href="/bids"
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
-                My Bids
+                Profile
               </Link>
               <Link
                 href="/listings"
@@ -60,11 +48,7 @@ export async function Header() {
               >
                 Browse
               </Link>
-              {profileData && (
-                <span className="hidden text-xs font-medium text-zinc-400 sm:inline dark:text-zinc-500">
-                  {profileData.userType === "PERSONAL" ? "Personal" : "Org"} · {profileData.displayName}
-                </span>
-              )}
+              
               <LogoutButton />
             </>
           ) : (

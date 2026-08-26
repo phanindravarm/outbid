@@ -11,7 +11,9 @@ export default async function PublicListingsPage() {
   let unranked: {
     id: string;
     title: string;
+    url: string | null;
     description: string | null;
+    category: string | null;
     createdAt: Date;
     ownerName: string;
     ownerType: string;
@@ -28,7 +30,9 @@ export default async function PublicListingsPage() {
         .select({
           id: listings.id,
           title: listings.title,
+          url: listings.url,
           description: listings.description,
+          category: listings.category,
           createdAt: listings.createdAt,
           ownerName: profiles.displayName,
           ownerType: profiles.userType,
@@ -50,7 +54,9 @@ export default async function PublicListingsPage() {
         .select({
           id: listings.id,
           title: listings.title,
+          url: listings.url,
           description: listings.description,
+          category: listings.category,
           createdAt: listings.createdAt,
           ownerName: profiles.displayName,
           ownerType: profiles.userType,
@@ -103,15 +109,27 @@ export default async function PublicListingsPage() {
                       <h3 className="text-lg font-semibold group-hover:underline">
                         {item.title}
                       </h3>
+                      {item.url && (
+                        <span className="mt-0.5 inline-block text-xs text-blue-600 dark:text-blue-400">
+                          {item.url} ↗
+                        </span>
+                      )}
                       {item.description && (
                         <p className="mt-1 line-clamp-1 text-sm text-zinc-600 dark:text-zinc-400">
                           {item.description}
                         </p>
                       )}
-                      <p className="mt-1 text-xs text-zinc-500">
-                        {item.ownerType === "PERSONAL" ? "👤" : "🏢"}{" "}
-                        {item.ownerName}
-                      </p>
+                      <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
+                        {item.category && (
+                          <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                            {item.category.charAt(0) + item.category.slice(1).toLowerCase()}
+                          </span>
+                        )}
+                        <span>
+                          {item.ownerType === "PERSONAL" ? "👤" : "🏢"}{" "}
+                          {item.ownerName}
+                        </span>
+                      </div>
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="text-lg font-bold">
@@ -141,6 +159,11 @@ export default async function PublicListingsPage() {
                     <h3 className="text-lg font-semibold group-hover:underline">
                       {listing.title}
                     </h3>
+                    {listing.url && (
+                      <span className="mt-0.5 inline-block text-xs text-blue-600 dark:text-blue-400">
+                        {listing.url} ↗
+                      </span>
+                    )}
                     {listing.description && (
                       <p className="mt-2 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400">
                         {listing.description}

@@ -6,6 +6,8 @@ import { getSession } from "@/lib/auth";
 import {
   validateListingTitle,
   validateListingDescription,
+  validateUrl,
+  validateCategory,
   isValidUuid,
 } from "@/lib/validation";
 
@@ -27,7 +29,9 @@ export async function GET(_request: Request, { params }: RouteParams) {
         id: listings.id,
         userId: listings.userId,
         title: listings.title,
+        url: listings.url,
         description: listings.description,
+        category: listings.category,
         status: listings.status,
         createdAt: listings.createdAt,
         updatedAt: listings.updatedAt,
@@ -91,10 +95,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { title, description, status } = body as {
+    const { title, url, description, status, category } = body as {
       title?: string;
+      url?: string;
       description?: string;
       status?: string;
+      category?: string;
     };
 
     const updates: Record<string, unknown> = {
@@ -109,12 +115,28 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       updates.title = title.trim();
     }
 
+    if (url !== undefined) {
+      const urlError = validateUrl(url);
+      if (urlError) {
+        return NextResponse.json({ error: urlError }, { status: 400 });
+      }
+      updates.url = url.trim();
+    }
+
     if (description !== undefined) {
       const descError = validateListingDescription(description);
       if (descError) {
         return NextResponse.json({ error: descError }, { status: 400 });
       }
       updates.description = description.trim() || null;
+    }
+
+    if (category !== undefined) {
+      const catError = validateCategory(category);
+      if (catError) {
+        return NextResponse.json({ error: catError }, { status: 400 });
+      }
+      updates.category = category;
     }
 
     if (status !== undefined) {

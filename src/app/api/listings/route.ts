@@ -6,6 +6,8 @@ import { getSession } from "@/lib/auth";
 import {
   validateListingTitle,
   validateListingDescription,
+  validateUrl,
+  validateCategory,
 } from "@/lib/validation";
 
 // GET /api/listings — list active listings (public)
@@ -15,7 +17,9 @@ export async function GET() {
       .select({
         id: listings.id,
         title: listings.title,
+        url: listings.url,
         description: listings.description,
+        category: listings.category,
         status: listings.status,
         createdAt: listings.createdAt,
         ownerName: profiles.displayName,
@@ -51,10 +55,12 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, description, status } = body as {
+    const { title, url, description, status, category } = body as {
       title?: string;
+      url?: string;
       description?: string;
       status?: string;
+      category?: string;
     };
 
     const titleError = validateListingTitle(title ?? "");
@@ -62,9 +68,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: titleError }, { status: 400 });
     }
 
+    const urlError = validateUrl(url ?? "");
+    if (urlError) {
+      return NextResponse.json({ error: urlError }, { status: 400 });
+    }
+
     const descError = validateListingDescription(description ?? "");
     if (descError) {
       return NextResponse.json({ error: descError }, { status: 400 });
+    }
+
+    const categoryError = validateCategory(category);
+    if (categoryError) {
+      return NextResponse.json({ error: categoryError }, { status: 400 });
     }
 
     const listingStatus =
@@ -75,7 +91,9 @@ export async function POST(request: Request) {
       .values({
         userId: session.userId,
         title: title!.trim(),
+        url: url!.trim(),
         description: description?.trim() || null,
+        category: category as "TECH" | "BUSINESS" | "BLOG" | "ECOMMERCE" | "PORTFOLIO" | "COMMUNITY" | "NEWS" | "ENTERTAINMENT",
         status: listingStatus,
       })
       .returning({ id: listings.id });

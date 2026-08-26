@@ -3,11 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { LISTING_CATEGORIES } from "@/lib/validation";
 
 export default function NewListingPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
   const [status, setStatus] = useState<"DRAFT" | "ACTIVE">("ACTIVE");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +24,7 @@ export default function NewListingPage() {
       const res = await fetch("/api/listings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, status }),
+        body: JSON.stringify({ title, url, description, category, status }),
       });
       const data = await res.json();
 
@@ -61,7 +64,7 @@ export default function NewListingPage() {
 
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1.5">
-            Title
+            Site Name
           </label>
           <input
             id="title"
@@ -72,7 +75,23 @@ export default function NewListingPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400 dark:focus:ring-zinc-400"
-            placeholder="What are you listing?"
+            placeholder="Your website name"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="url" className="block text-sm font-medium mb-1.5">
+            Website URL
+          </label>
+          <input
+            id="url"
+            type="url"
+            required
+            maxLength={512}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400 dark:focus:ring-zinc-400"
+            placeholder="https://example.com"
           />
         </div>
 
@@ -93,6 +112,28 @@ export default function NewListingPage() {
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400 dark:focus:ring-zinc-400"
             placeholder="Describe your listing in detail..."
           />
+        </div>
+
+        <div>
+          <label htmlFor="category" className="block text-sm font-medium mb-1.5">
+            Category
+          </label>
+          <select
+            id="category"
+            required
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-400 dark:focus:ring-zinc-400"
+          >
+            <option value="" disabled>
+              Select a category
+            </option>
+            {LISTING_CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat.charAt(0) + cat.slice(1).toLowerCase()}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

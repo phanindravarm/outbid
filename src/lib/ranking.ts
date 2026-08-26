@@ -14,7 +14,9 @@ export interface RankedListing {
   rank: number;
   listingId: string;
   title: string;
+  url: string | null;
   description: string | null;
+  category: string | null;
   ownerName: string;
   ownerType: string;
   highestBid: number; // cents
@@ -28,7 +30,9 @@ export async function getRankedListings(): Promise<RankedListing[]> {
     .select({
       listingId: listings.id,
       title: listings.title,
+      url: listings.url,
       description: listings.description,
+      category: listings.category,
       ownerName: profiles.displayName,
       ownerType: profiles.userType,
       highestBid: max(bids.amount),
@@ -44,7 +48,9 @@ export async function getRankedListings(): Promise<RankedListing[]> {
     .groupBy(
       listings.id,
       listings.title,
+      listings.url,
       listings.description,
+      listings.category,
       profiles.displayName,
       profiles.userType,
     )
@@ -57,7 +63,9 @@ export async function getRankedListings(): Promise<RankedListing[]> {
     rank: idx + 1,
     listingId: row.listingId,
     title: row.title,
+    url: row.url,
     description: row.description,
+    category: row.category,
     ownerName: row.ownerName,
     ownerType: row.ownerType,
     highestBid: row.highestBid ?? 0,

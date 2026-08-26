@@ -77,7 +77,7 @@ export function BidForm({
         amount: data.amount,
         currency: data.currency,
         name: "OutBid",
-        description: `Bid on listing`,
+        description: `Boost your listing rank`,
         order_id: data.orderId,
         prefill: {
           email: userEmail,
@@ -196,7 +196,7 @@ export function BidForm({
           disabled={loading}
           className="w-full rounded-lg bg-foreground px-4 py-2.5 text-sm font-semibold text-background transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:hover:bg-zinc-300"
         >
-          {loading ? "Processing..." : "Place bid & pay"}
+          {loading ? "Processing..." : "Boost & pay"}
         </button>
 
         <p className="text-center text-xs text-zinc-400">

@@ -12,6 +12,7 @@ const PUBLIC_API_PREFIXES = [
   "/api/listings",
   "/api/rankings",
   "/api/webhooks",
+  "/api/stats",
 ];
 
 function isPublicApiRoute(pathname: string): boolean {
@@ -20,13 +21,15 @@ function isPublicApiRoute(pathname: string): boolean {
   );
 }
 
-export function middleware(request: NextRequest) {
+const VISITOR_COOKIE = "outbid_visited";
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasSession = request.cookies.has(SESSION_COOKIE);
 
   // Authenticated users shouldn't visit login/signup
   if (hasSession && AUTH_PATHS.includes(pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/profile", request.url));
   }
 
   // Public pages
@@ -34,6 +37,19 @@ export function middleware(request: NextRequest) {
     PUBLIC_PATHS.includes(pathname) ||
     pathname.startsWith("/listings")
   ) {
+    // Track unique visitors on public pages
+    if (!request.cookies.has(VISITOR_COOKIE)) {
+      const response = NextResponse.next();
+      response.cookies.set(VISITOR_COOKIE, "1", {
+        maxAge: 60 * 60 * 24, // 24 hours
+        httpOnly: true,
+        sameSite: "lax",
+      });
+      // Fire-and-forget visitor increment
+      const statsUrl = new URL("/api/stats", request.url);
+      fetch(statsUrl, { method: "POST" }).catch(() => {});
+      return response;
+    }
     return NextResponse.next();
   }
 
